@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="FR" class="h-100">
+
+<head>
+    <title>Choisisseur de film</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"
+        integrity="sha512-WW8/jxkELe2CAiE4LvQfwm1rajOS8PHasCCx+knHG0gBHt8EXxS6T6tJRTGuDQVnluuAvMxWF4j8SNFDKceLFg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+        integrity="sha512-b2QcS5SsA8tZodcDtGRELiGv5SaKSk1vDHDaQRda0htPYWZ6046lr3kJ5bAAQdpV2mmA/4v0wQF9MyU6/pDIAg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="w-100 h-100 bg-dark">
+    <div class="row h-100">
+        <div class="col-5">
+            <img class="easeload" onload="this.style.opacity=1" id="movie-poster-1" />
+            <img class="easeload" onload="this.style.opacity=1" id="movie-poster-2" />
+            <img class="easeload" onload="this.style.opacity=1" id="movie-poster-3" />
+            <img class="easeload" onload="this.style.opacity=1" id="movie-poster-4" />
+
+        </div>
+        <div class="col-6 mt-5 p-5 my-auto">
+            <div class="px-4 text-white-50">
+                <h1 class="text-white" id="movie-title">Appuyez sur n'importe quel touche pour trouver un film</h1>
+                <h3 class="text-warning" id="movie-rating"></h3> 
+                <h5 class="text-white-50" id="movie-number-rating"></h5>
+            </div>
+
+            <div class="card bg-danger rounded-1 bg-transparent text-white-50">
+                <div class="card-body shadow" id="movie-synopsis">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
+
+<style>
+    .easeload {
+        opacity: 0;
+        -webkit-transition: all 1s ease;
+        -moz-transition: all 1s ease;
+        -ms-transition: all 1s ease;
+        -o-transition: all 1s ease;
+    }
+
+    .bg-dark {
+        background-color: #111211 !important;
+    }
+
+    h1 {
+        font-size: 45px;
+    }
+
+    h5 {
+        font-size:16px
+    }
+
+    html {
+        font-size: 20px;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    const img_url = "https://image.tmdb.org/t/p/w500/";
+    let movie_id;
+
+    $(document).on("keypress", function (event) {
+
+        if (event.keyCode == 13) {
+            location.href = `https://movie-web.app/media/tmdb-movie-${movie_id}`
+        }
+
+        let page = Math.floor(Math.random() * 100);
+        $(".easeload").css("opacity",0)
+        $.ajax({
+            url: `https://api.themoviedb.org/3/discover/movie?include_adult=true&include_video=false&language=fr-FR&page=${page}&sort_by=popularity.desc&vote_average.gte=6.5&vote_count.gte=200`,
+            type: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MDM4NzVhY2FhNzM3NjdmNzBkZjllZWI0ZmFkZmUzNiIsInN1YiI6IjY1NzhjODM3NTY0ZWM3MDBmZWI1YzliMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JKMeACdHtUiNmoZlc2Zct3PludI1HH53YvOmdJq5h4w'
+            },
+            dataType: "json",
+            success: (data) => {
+
+                let movie = data.results[Math.floor(Math.random() * data.results.length)];
+                console.log(movie);
+                $("#movie-synopsis").text(movie.overview);
+                $("#movie-title").text(movie.title)
+                $("#movie-rating").text(`${movie.vote_average} / 10 TMDB`)
+                $("#movie-number-rating").text(`${movie.vote_count} notes`)
+                movie_id = movie.id;
+
+                $.ajax({
+                    url: `https://api.themoviedb.org/3/movie/${movie_id}/images`,
+                    type: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MDM4NzVhY2FhNzM3NjdmNzBkZjllZWI0ZmFkZmUzNiIsInN1YiI6IjY1NzhjODM3NTY0ZWM3MDBmZWI1YzliMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JKMeACdHtUiNmoZlc2Zct3PludI1HH53YvOmdJq5h4w'
+                    },
+                    dataType: "json",
+                    success: (data) => {
+                        $("#movie-poster-1").attr("src", img_url + data.backdrops[0].file_path);
+                        $("#movie-poster-2").attr("src", img_url + data.backdrops[1].file_path);
+                        $("#movie-poster-3").attr("src", img_url + data.backdrops[2].file_path);
+                        $("#movie-poster-4").attr("src", img_url + data.backdrops[3].file_path);
+                    }
+                })
+            }
+        });
+
+
+    });
+</script>

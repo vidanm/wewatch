@@ -1,5 +1,5 @@
 ## Trouver un film à regarder au hasard parmi les films référencés sur TMDB avec une note supérieure à 6.7/10
-[Lien](vidanm.github.io/watch-movie-no-keyboard)
+[Lien](https://vidanm.github.io/watch-movie-no-keyboard)
 
 Espace - changer de film
 
